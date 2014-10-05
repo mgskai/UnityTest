@@ -2,9 +2,23 @@
 using System.Collections;
 
 public class MineControllor : MonoBehaviour {
-
+    
     public TextMesh mineText;
+    
+    private bool _IsMine;
+    public bool IsMine
+    {
+        get
+        {
+            return _IsMine;
+        }
+        set
+        {
+            _IsMine = value;
+        }
+    }
 
+    
     void start()
     {
         renderer.material.color = Color.green;
