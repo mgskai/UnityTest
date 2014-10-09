@@ -9,10 +9,11 @@ public class GameOverDialog : MonoBehaviour {
     void OnGUI()
     {
         GUI.skin = customSkin;
-        GUI.Box(
-            new Rect(Screen.width/2 - 50, Screen.height/2 - 45, 100, 90), "Game Over!");
         GUI.DrawTexture(
             new Rect(Screen.width / 2 - 50, Screen.height / 2 - 45, 100, 90), backgroudTexture);
+        GUI.Box(
+            new Rect(Screen.width/2 - 50, Screen.height/2 - 45, 100, 90), "Game Over!");
+
 
         if (GUI.Button(new Rect(Screen.width / 2 - 40, Screen.height / 2 - 15, 80, 20), "Restart"))
         {
