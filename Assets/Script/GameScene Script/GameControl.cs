@@ -19,6 +19,15 @@ public class GameControl : MonoBehaviour {
         mineArray = new MineControllor[mineGrid.Row, mineGrid.Column];
         GenerateMine();    
     }
+
+    void FixedUpdate()
+    {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Application.LoadLevel("titleScene");
+        }
+
+    }
     
     void GenerateMine()
     {

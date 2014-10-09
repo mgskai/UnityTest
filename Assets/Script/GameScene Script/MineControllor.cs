@@ -1,11 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
 public class MineControllor : MonoBehaviour {
-    
+
+    public enum MineStatus
+    {
+        Normal,
+        Flag,
+        Clear,
+        Mine
+    };
+
     public TextMesh mineText;
-    
+    public GameObject gameOverMessageBox;
+
     private bool _IsMine;
     public bool IsMine
     {
@@ -44,55 +52,78 @@ public class MineControllor : MonoBehaviour {
             _Column = value;
         }
     }
+
+    private MineStatus _CurrentMineStatus;
+    public MineStatus CurrentMineStatus
+    {
+        get
+        {
+            return _CurrentMineStatus;
+        }
+        set
+        {
+            _CurrentMineStatus = value;
+        }
+    }
     
-    private static bool firstClick = true;
-     private BoxCollider bc;
+    private static bool firstClick;
+     private BoxCollider mineCollider;
     void Awake()
     {
+        firstClick = true;
         renderer.material.color = Color.green;
         mineText.text = "";
-        bc = GetComponent<BoxCollider>();
+        mineCollider = GetComponent<BoxCollider>();
+        CurrentMineStatus = MineStatus.Normal;
     }
 
-    //void OnMouseEnter()
-    //{
-    //    renderer.material.color = Color.cyan;
-    //}
+    void OnMouseEnter()
+    {
+        if (CurrentMineStatus == MineStatus.Normal)
+        {
+            renderer.material.color = Color.cyan;
+        }
+    }
 
-    //void OnMouseExit()
-    //{
-    //    if (bc.enabled)
-    //    {
-    //        renderer.material.color = Color.green;
-    //    }
-    //}
+    void OnMouseExit()
+    {
+        if (CurrentMineStatus == MineStatus.Normal)
+        {
+            renderer.material.color = Color.green;
+        }
+    }
 
     void OnMouseOver()
     {
-        renderer.material.color = Color.cyan;
-        if (Input.GetMouseButtonDown(0))
+        if (CurrentMineStatus != MineStatus.Clear)
         {
-            if (firstClick)
+            if (Input.GetMouseButtonDown(0))
             {
-                AssignMine();
-                firstClick = false;
+                if (firstClick)
+                {
+                    AssignMine();
+                    firstClick = false;
+                }
+                if (IsMine)
+                {
+                    Instantiate(gameOverMessageBox);
+                    renderer.material.color = Color.red;
+                    CurrentMineStatus = MineStatus.Mine;
+                    DisableAllMine();
+                    
+                }
+                else
+                {
+                    CurrentMineStatus = MineStatus.Clear;
+                    renderer.material.color = Color.blue;
+                }
             }
-            if (IsMine)
+            if (Input.GetMouseButtonDown(1))
             {
-                renderer.material.color = Color.red;
+                renderer.material.color = Color.yellow;
+                CurrentMineStatus = MineStatus.Flag;
             }
-            else
-            {
-                renderer.material.color = Color.blue;
-            }
-            bc.enabled = false;
         }
-        if (Input.GetMouseButtonDown(1))
-        {
-            renderer.material.color = Color.yellow;
-            bc.enabled = false;
-        }
-
     }
 
     //void OnMouseUp()
@@ -112,6 +143,31 @@ public class MineControllor : MonoBehaviour {
     //    }
     //    bc.enabled = false;
     //}
+
+    void DisableAllMine()
+    {
+        GameObject gameController = GameObject.Find("GameController");
+        GameControl gameControl = gameController.GetComponent<GameControl>();
+
+        for(int i = 0; i < gameControl.mineArray.GetLength(0); i++)
+        {
+            for (int j = 0; j < gameControl.mineArray.GetLength(1); j++)
+            {
+                MineControllor m = gameControl.mineArray[i, j];
+                if (m.IsMine)
+                {
+                    m.renderer.material.color = Color.red;
+                }
+                else
+                {
+                    m.renderer.material.color = Color.blue;
+                }
+                BoxCollider bc = m.GetComponent<BoxCollider>();
+                bc.enabled = false;
+            }
+
+        }
+    }
 
     void AssignMine()
     {
